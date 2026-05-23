@@ -1,0 +1,27 @@
+{
+  "name": "pi-tickets",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Lightweight pi extension for tk ticket workflows",
+  "main": "index.ts",
+  "scripts": {
+    "lint": "tsc --noEmit",
+    "build": "tsc --project tsconfig.json"
+  },
+  "keywords": ["pi", "pi-extension", "tickets", "tk"],
+  "license": "MIT",
+  "files": ["index.ts", "README.md", "tsconfig.json"],
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "dependencies": {
+    "typebox": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "typescript": "^6.0.3"
+  },
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}
