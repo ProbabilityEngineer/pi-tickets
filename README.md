@@ -2,11 +2,27 @@
 
 Lightweight pi extension for [`tk`](https://github.com/) ticket workflows.
 
-It adds one compact tool:
+It adds one compact tool and one user command:
 
 - `ticket` — list, inspect, create, start, close, and note tk tickets.
+- `/tickets` — initialize or inspect tickets from the prompt UI.
 
-The extension intentionally avoids injecting ticket lists into context. Agents can call the tool when ticket context is useful.
+The extension intentionally avoids injecting ticket lists into context. Agents can call the tool when ticket context is useful. Ticket actions may modify `.tickets/`; they should not touch code unless the task requires it.
+
+## Command
+
+```bash
+/tickets init
+/tickets ready
+/tickets list
+/tickets show <id>
+/tickets create <title>
+/tickets start <id>
+/tickets note <id> <text>
+/tickets close <id>
+```
+
+`/tickets init` creates `.tickets/.gitkeep` so ticket tracking can be committed before the first ticket exists.
 
 ## Tool actions
 
