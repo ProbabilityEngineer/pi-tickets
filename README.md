@@ -18,6 +18,7 @@ The extension intentionally avoids injecting ticket lists into context. Agents c
 /tickets show <id>
 /tickets create <title>
 /tickets start <id>
+/tickets status <id> <open|in_progress|closed>
 /tickets note <id> <text>
 /tickets close <id>
 ```
@@ -34,6 +35,8 @@ The extension intentionally avoids injecting ticket lists into context. Agents c
 { "action": "start", "id": "abc-123" }
 { "action": "close", "id": "abc-123" }
 { "action": "note", "id": "abc-123", "note": "Investigation notes..." }
+{ "action": "status", "id": "abc-123", "status": "in_progress" }
+{ "action": "update", "id": "abc-123", "title": "Better title", "acceptance": "Updated criteria" }
 ```
 
 `tk create` initializes `.tickets/` if needed.
