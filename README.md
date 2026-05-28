@@ -1,13 +1,32 @@
 # pi-tickets
 
-Lightweight pi extension for [`tk`](https://github.com/) ticket workflows.
+Compact tk ticket workflow tools for Pi agents with low prompt overhead.
 
-It adds one compact tool and one user command:
+`pi-tickets` gives Pi agents a small, explicit interface to [`tk`](https://github.com/radutopala/ticket) tickets without injecting ticket lists into every prompt. It provides one compact model-visible `ticket` tool for listing, creating, starting, updating, noting, and closing tickets, plus a `/tickets` command for user-facing ticket actions. Ticket state stays in the repo's `.tickets/` files, so real project work can be reviewed and committed like any other project artifact.
 
-- `ticket` — list, inspect, create, start, close, and note tk tickets.
-- `/tickets` — initialize or inspect tickets from the prompt UI.
+## Install
 
-The extension intentionally avoids injecting ticket lists into context. Agents can call the tool when ticket context is useful. Ticket actions may modify `.tickets/`; they should not touch code unless the task requires it.
+From npm:
+
+```bash
+pi install npm:pi-tickets
+```
+
+From GitHub:
+
+```bash
+pi install git:github.com/ProbabilityEngineer/pi-tickets
+```
+
+For project-local install, add `-l`:
+
+```bash
+pi install -l git:github.com/ProbabilityEngineer/pi-tickets
+```
+
+## Requirements
+
+Install [`tk`](https://github.com/radutopala/ticket) so the `tk` executable is on `PATH`.
 
 ## Command
 
@@ -27,6 +46,14 @@ The extension intentionally avoids injecting ticket lists into context. Agents c
 
 ## Tool actions
 
+One compact model-visible tool:
+
+```text
+ticket action: ready/list/show/create/start/close/note/status/update
+```
+
+Examples:
+
 ```json
 { "action": "ready", "limit": 10 }
 { "action": "list", "status": "open" }
@@ -41,17 +68,9 @@ The extension intentionally avoids injecting ticket lists into context. Agents c
 
 `tk create` initializes `.tickets/` if needed.
 
-## Install
+## Prompt overhead
 
-```bash
-pi install git:github.com/ProbabilityEngineer/pi-tickets
-```
-
-For local testing:
-
-```bash
-pi -e ./index.ts
-```
+`pi-tickets` avoids automatic ticket-list injection. Agents can call the `ticket` tool when ticket context is useful, keeping prompts small and cache-friendly.
 
 ## Development
 

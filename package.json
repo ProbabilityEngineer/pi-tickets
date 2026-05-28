@@ -1,25 +1,49 @@
 {
   "name": "pi-tickets",
   "version": "0.1.0",
+  "private": false,
   "type": "module",
-  "description": "Lightweight pi extension for tk ticket workflows",
+  "description": "Compact tk ticket workflow tools for Pi agents with low prompt overhead.",
   "main": "index.ts",
+  "license": "MIT",
+  "author": "ProbabilityEngineer",
+  "homepage": "https://github.com/ProbabilityEngineer/pi-tickets#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ProbabilityEngineer/pi-tickets.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ProbabilityEngineer/pi-tickets/issues"
+  },
   "scripts": {
     "lint": "tsc --noEmit",
     "build": "tsc --project tsconfig.json"
   },
-  "keywords": ["pi", "pi-extension", "tickets", "tk"],
-  "license": "MIT",
-  "files": ["index.ts", "README.md", "tsconfig.json"],
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "pi",
+    "tickets",
+    "ticketing",
+    "tk",
+    "tasks",
+    "workflow"
+  ],
+  "files": [
+    "index.ts",
+    "README.md",
+    "LICENSE",
+    "tsconfig.json"
+  ],
   "peerDependencies": {
-    "@earendil-works/pi-coding-agent": "*"
-  },
-  "dependencies": {
-    "typebox": "^1.0.0"
+    "@earendil-works/pi-coding-agent": "*",
+    "typebox": "*"
   },
   "devDependencies": {
+    "@earendil-works/pi-coding-agent": "^0.76.0",
     "@types/node": "^25.6.0",
-    "typescript": "^6.0.3"
+    "typescript": "^5.9.3",
+    "typebox": "latest"
   },
   "pi": {
     "extensions": ["./index.ts"]
