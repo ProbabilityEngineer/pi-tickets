@@ -1,6 +1,6 @@
 {
   "name": "pi-tickets",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "type": "module",
   "description": "Compact tk ticket workflow tools for Pi agents with low prompt overhead.",
@@ -46,6 +46,8 @@
     "typebox": "latest"
   },
   "pi": {
-    "extensions": ["./index.ts"]
+    "extensions": [
+      "./index.ts"
+    ]
   }
 }
