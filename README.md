@@ -50,6 +50,7 @@ One compact model-visible tool:
 
 ```text
 ticket action: ready/list/show/create/start/close/note/status/update
+# Optional: cwd=/path/to/repo for tickets in another repository
 ```
 
 Examples:
@@ -66,7 +67,7 @@ Examples:
 { "action": "update", "id": "abc-123", "title": "Better title", "acceptance": "Updated criteria" }
 ```
 
-`tk create` initializes `.tickets/` if needed.
+`tk create` initializes `.tickets/` if needed. For another repository, pass the ticket tool `cwd` parameter or use `/tickets --cwd <repo> ...`; the extension runs `tk` in that repository instead of requiring agents to write `.tickets/` files manually.
 
 ## Prompt overhead
 

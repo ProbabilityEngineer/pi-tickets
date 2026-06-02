@@ -9,9 +9,10 @@ const STATUSES = ["open", "in_progress", "closed"] as const;
 const TYPES = ["bug", "feature", "task", "epic", "chore"] as const;
 const MAX_OUTPUT = 40_000;
 const TICKET_PROMPT_SNIPPET =
-	"Ticket routing: for non-trivial feature/fix work, use ticket ready/show/create/start/close to track tk tickets.";
+	"Ticket routing: for non-trivial feature/fix work, use ticket ready/show/create/start/close to track tk tickets; set cwd for tickets in another repo.";
 const TICKET_GUIDELINES = [
 	"For non-trivial feature/fix work, check ready tickets or create/start/close a ticket when useful; ticket actions may modify .tickets/ but should not touch code unless the task requires it.",
+	"When managing tickets for a repo other than the current Pi cwd, pass the ticket tool cwd parameter instead of manually writing .tickets files.",
 ];
 
 type RunResult = { code: number | null; stdout: string; stderr: string };
@@ -19,6 +20,7 @@ type ToolCtx = { cwd?: string };
 
 type TicketParams = {
 	action: (typeof ACTIONS)[number];
+	cwd?: string;
 	id?: string;
 	title?: string;
 	description?: string;
@@ -224,6 +226,13 @@ function commandArgs(input: string) {
 	return { action, rest };
 }
 
+function parseCommandCwd(rest: string[], fallback?: string) {
+	const cwdIndex = rest.findIndex((value) => value === "--cwd" || value === "--repo" || value === "-C");
+	if (cwdIndex < 0) return { cwd: fallback, rest };
+	const cwd = requireField(rest[cwdIndex + 1], "cwd");
+	return { cwd: path.resolve(fallback ?? process.cwd(), cwd), rest: [...rest.slice(0, cwdIndex), ...rest.slice(cwdIndex + 2)] };
+}
+
 function tkArgsForCommand(input: string): string[] | null {
 	const trimmed = input.trim();
 	const { action, rest } = commandArgs(trimmed);
@@ -249,16 +258,18 @@ async function initTickets(cwd?: string) {
 
 export default function (pi: ExtensionAPI) {
 	pi.registerCommand("tickets", {
-		description: "Initialize or inspect tk tickets: init, ready, list, show/start/close <id>, status <id> <status>, create <title>, note <id> <text>",
+		description: "Initialize or inspect tk tickets: init, ready, list, show/start/close <id>, status <id> <status>, create <title>, note <id> <text>; use --cwd <repo> for another repo",
 		handler: async (args, ctx) => {
 			try {
 				const parsed = commandArgs(args);
+				const scoped = parseCommandCwd(parsed.rest, ctx.cwd);
+				const scopedInput = [parsed.action, ...scoped.rest].join(" ");
 				if (parsed.action === "init") {
-					ctx.ui.notify(await initTickets(ctx.cwd), "info");
+					ctx.ui.notify(await initTickets(scoped.cwd), "info");
 					return;
 				}
-				const tkArgs = tkArgsForCommand(args)!;
-				const result = await runTk(tkArgs, ctx.cwd);
+				const tkArgs = tkArgsForCommand(scopedInput)!;
+				const result = await runTk(tkArgs, scoped.cwd);
 				ctx.ui.notify(output(result, parsed.action as TicketParams["action"]), result.code === 0 ? "info" : "warning");
 			} catch (error) {
 				ctx.ui.notify(error instanceof Error ? error.message : String(error), "error");
@@ -274,6 +285,7 @@ export default function (pi: ExtensionAPI) {
 		promptGuidelines: TICKET_GUIDELINES,
 		parameters: Type.Object({
 			action: Type.String({ enum: [...ACTIONS] as string[] }),
+			cwd: Type.Optional(Type.String({ description: "Repository cwd containing .tickets; use for ticket actions in another repo." })),
 			id: Type.Optional(Type.String()),
 			title: Type.Optional(Type.String()),
 			description: Type.Optional(Type.String()),
@@ -291,16 +303,17 @@ export default function (pi: ExtensionAPI) {
 		}),
 		async execute(_id: string, params: TicketParams, _signal: AbortSignal, _update: unknown, ctx: ToolCtx) {
 			try {
+				const cwd = params.cwd ? path.resolve(ctx.cwd ?? process.cwd(), params.cwd) : ctx.cwd;
 				if (params.action === "update") {
-					return text(await updateTicket(params, ctx.cwd), { code: 0, action: "update" });
+					return text(await updateTicket(params, cwd), { code: 0, action: "update", cwd });
 				}
 				const args = argsFor(params);
-				const result = await runTk(args, ctx.cwd);
+				const result = await runTk(args, cwd);
 				const rendered = output(result, params.action)
 					.split(/\r?\n/)
 					.slice(0, params.action === "ready" || params.action === "list" ? clampLimit(params.limit) : 200)
 					.join("\n");
-				return text(rendered, { code: result.code, command: "tk", args });
+				return text(rendered, { code: result.code, command: "tk", args, cwd });
 			} catch (error) {
 				return text(error instanceof Error ? error.message : String(error), { code: 2 });
 			}
